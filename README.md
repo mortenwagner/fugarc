@@ -1,5 +1,8 @@
 # FUGARC
+
 "awake meets fugu"
+
+A lua-script for the Monome Norns
 
 by @popgoblin - current release v1.0.0
 
@@ -7,10 +10,10 @@ A lua-script for the Monome Norns. Inspired by the fugu-script by @itsyourbedtim
 
 Every function can be used without Grids, Arc or the Ansible. It will not make sense without the Crow connected to CV-responding gear though.
 
-A pattern (between 1 and 16 steps wide) can be played as 4 different tracks. 
-Think of a track as a "playhead" you can direct to move through the steps with different speeds, different directions — or even randomly. You can also set each track to transpose the steps of patterns. 
+A pattern (between 1 and 16 steps wide) can be played as 4 different tracks.
+Think of a track as a "playhead" you can direct to move through the steps with different speeds, different directions — or even randomly. You can also set each track to transpose the steps of patterns.
 
-Pitch and trigger information for each track can be directed to crow and/or ansible outputs in the parameter section. 
+Pitch and trigger information for each track can be directed to crow and/or ansible outputs in the parameter section.
 
 Also available are options to direct clock-signals, extra LFO's and random voltages to crow outputs - available in the parameter-sections.
 
