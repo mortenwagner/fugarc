@@ -1,12 +1,10 @@
-# FUGARC
+## Fugarc
 
-"awake meets fugu"
+"awake meets fugu" - a for the Norns (@popgoblin)
 
-A lua-script for the Monome Norns
+*Current release v1.0.0*
 
-by @popgoblin - current release v1.0.0
-
-A lua-script for the Monome Norns. Inspired by the fugu-script by @itsyourbedtime and "Fugue-machine" for the iPad, but based on the Awake script by @tehn. Optimised for use with Crow, Arc, Grid with Ansible thru Crow and i2c.
+Fugarc is inspired by the fugu-script by @its_your_bedtime  and "Fugue-machine" for the iPad, but based on the Awake script by @tehn. Optimised for use with Crow, Arc, Grid with Ansible thru Crow and i2c.
 
 Every function can be used without Grids, Arc or the Ansible. It will not make sense without the Crow connected to CV-responding gear though.
 
@@ -17,25 +15,30 @@ Pitch and trigger information for each track can be directed to crow and/or ansi
 
 Also available are options to direct clock-signals, extra LFO's and random voltages to crow outputs - available in the parameter-sections.
 
+### Requirements:
+- Crow
+
+Optional: *Ansible, Arc, Grid*
+
 ### Controls:
 - **Grids** controls pattern
 
 - **Arc** controls track 1 through 4 playback-modes. K1+Arc controls speed.
 
-- E1 changes modes:
+- **E1** changes modes:
 	STEP/LOOP/TRACKS/OPTION
 
-- K1 held is alt *
+- **K1** held is alt *
 
 #### STEP
-- E2/E3 move/change
-- K2  *clear
+- **E2/E3** move/change
+- **K2**  *clear
 #### LOOP
-- E2 loop length
+- **E2** loop length
 #### TRACKS
-- E2 selects
-- E3 changes div *transpose
-- K2/K3 step thru  modes
+- **E2** selects
+- **E3** changes div *transpose
+- **K2/K3** step thru  modes
 #### OPTION
 - *toggle
-- E2/E3 changes
+- **E2/E3** changes
