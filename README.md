@@ -1,4 +1,5 @@
-# fugarc - "awake meets fugu"
+# FUGARC
+## - "awake meets fugu"
 A lua-script for the Monome Norns
 
 (best w. crow, grids & arc)
