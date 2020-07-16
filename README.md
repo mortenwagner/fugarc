@@ -2,7 +2,7 @@
 
 "awake meets fugu" - a for the Norns (@popgoblin)
 
-*Current release v1.0.0*
+*Current release v1.0.1*
 
 Fugarc is inspired by the fugu-script by @its_your_bedtime  and "Fugue-machine" for the iPad, but based on the Awake script by @tehn. Optimised for use with Crow, Arc, Grid with Ansible thru Crow and i2c.
 
