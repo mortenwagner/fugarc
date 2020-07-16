@@ -11,14 +11,14 @@ Every function can be used without Grids, Arc or the Ansible. It will not make s
 A pattern (between 1 and 16 steps wide) can be played as 4 different tracks.
 Think of a track as a "playhead" you can direct to move through the steps with different speeds, different directions — or even randomly. You can also set each track to transpose the steps of patterns.
 
-Pitch and trigger information for each track can be directed to crow and/or ansible outputs in the parameter section.
+Pitch and trigger information for each track can be directed to crow and/or ansible outputs in the parameter section. You can also direct track outputs to (seperate) midi channels
 
 Also available are options to direct clock-signals, extra LFO's and random voltages to crow outputs - available in the parameter-sections.
 
 ### Requirements:
 - Crow
 
-Optional: *Ansible, Arc, Grid*
+Optional: *Ansible, Arc, Grid, MIDI*
 
 ### Controls:
 - **Grids** controls pattern
