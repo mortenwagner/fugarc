@@ -5,7 +5,7 @@
 -- & clocks in params
 --
 -- See more on lines forum
--- v 1.0.0 @popgoblin
+-- v 1.0.2 @popgoblin
 -- --------------------------
 -- E1 changes modes:
 -- STEP/LOOP/TRACKS/OPTION
@@ -40,10 +40,12 @@ crowFxClockRun        = {}
 encPos = {}
 
 cvOuts = {'off','ACV1','ACV2','ACV3','ACV4',
-          'CRW1','CRW2','CRW3','CRW4'}
+          'CRW1','CRW2','CRW3','CRW4',
+          'TXo1','TXo2','TXo3','TXo4'}
 
 trOuts = {'off', 'ATR1','ATR2','ATR3','ATR4',
-          'CRW1','CRW2','CRW3','CRW4'}
+          'CRW1','CRW2','CRW3','CRW4',
+          'TXo1','TXo2','TXo3','TXo4'}
 
 crowOutFx = {'off',
              'Track 1 AR', 'Track 2 AR', 'Track 3 AR', 'Track 4 AR',
@@ -61,6 +63,7 @@ m = midi.connect()
 chainsaw = true
 
 alt = false
+altOpt = false
 
 mode = 1
 
@@ -110,7 +113,7 @@ end
 
 local function patternStep(trk)
   while true do
-    clock.sync(1/params:get("trk_"..trk.."_step_div"))
+    clock.sync(params:get("trk_"..trk.."_steps")/params:get("trk_"..trk.."_step_div"))
     --first figure out how to advance/randomize the track
     if (voiceClockDir[trk]==1) then
       voicePatternPos[trk] = voicePatternPos[trk]+1
@@ -151,7 +154,9 @@ local function patternStep(trk)
             end
           --check if there is midi-output for this track
           if m and params:get("trk_"..trk.."_midiCh")>0 then
-              sendMidiNote(note_num,params:get("trk_"..trk.."_midiCh"),params:get("trk_"..trk.."_midiVel"))
+              mvel = params:get("trk_"..trk.."_midiVel")+math.random(params:get("midiVelVar"))
+              if mvel >= 127 then mvel = 127 end
+              sendMidiNote(note_num,params:get("trk_"..trk.."_midiCh"),mvel)
             end
       end
 		end
@@ -176,7 +181,9 @@ function sendCrowAR(out)
  function sendTrigger(triggerListIndex)
    if triggerListIndex==1 then return end --off
     if (triggerListIndex<6) then crow.ii.ansible.trigger_pulse(triggerListIndex-1)
-      else
+      elseif (triggerListIndex>9)
+          then crow.ii.txo.tr_pulse(triggerListIndex-9)
+        else
         crow.output[triggerListIndex-5].action = "{pulse(0.05,10,1)}"
          crow.output[triggerListIndex-5].execute()
         end
@@ -186,7 +193,9 @@ function sendCrowAR(out)
     if cvListIndex==1 then return end --off
     if (cvListIndex<6) then
           crow.ii.ansible.cv(cvListIndex-1, voltage)
-      else
+      elseif (cvListIndex>9)
+          then crow.ii.txo.cv(cvListIndex-9,voltage)
+        else
          crow.output[cvListIndex-5].volts = voltage
          crow.output[cvListIndex-5].execute()
         end
@@ -201,7 +210,11 @@ function sendCrowAR(out)
            m:note_off(noteNum, nil, mChannel)
            metro.free(noteOffMetro.id)
          end
-      noteOffMetro.time = 0.2
+      local midiNoteTime = params:get("midiLen")
+      if params:get("midiLenVar") > 0 then
+        midiNoteTime=midiNoteTime+math.random(params:get("midiLenVar"))
+        end
+      noteOffMetro.time = midiNoteTime
       noteOffMetro.count = 1
       noteOffMetro:start()
     end
@@ -268,8 +281,9 @@ function init()
     table.insert(scale_names, string.lower(MusicUtil.SCALES[i].name))
   end
 
-  params:add_group("TRACKS",16)
+  params:add_group("TRACKS",20)
   for i=1,4 do
+   	params:add{type = "number", id = "trk_"..i.."_steps", name = "Trk "..i.." Steps", min = 1, max = 16, default = 1}
    	params:add{type = "number", id = "trk_"..i.."_step_div", name = "Trk "..i.." Div", min = 1, max = 16, default = 4}
    	params:add{type = "number", id = "trk_"..i.."_transpose", name = "Trk "..i.." Trans", min = -24, max = 24, default = 0}
    	params:add{type = "option", id = "trk_"..i.."_cvout",name = "Trk "..i.." CV out", options = cvOuts, default = i+1}
@@ -279,12 +293,16 @@ function init()
 		encPos[i]=0;
   end
 
-  params:add_group("MIDI",8)
+  params:add_group("MIDI",12)
   for i=1,4 do
     -- MIDI Channel 0 == off
    	params:add{type = "number", id = "trk_"..i.."_midiCh", name = "Trk "..i.." MIDI Channel", min = 0, max = 16, default = 0}
    	params:add{type = "number", id = "trk_"..i.."_midiVel", name = "Trk "..i.." Velocity", min = 0, max = 127, default = 100}
   end
+   params:add_separator()
+   	params:add{type = "number", id = "midiVelVar", name = "Midi Velocity Var", min = 0, max = 127, default = 20}
+   	params:add{type = "number", id = "midiLen", name = "Midi Length", min = 0.1, max = 10, default = 0.2}
+  	params:add{type = "number", id = "midiLenVar", name = "Midi Length Var", min = 0, max = 1000, default = 0}
 
 
   params:add_group("CROW Fx",4)
@@ -311,6 +329,10 @@ function init()
     crow.ii.ansible.cv_slew(j, 0)
     crow.ii.ansible.trigger_time( j, 5)
    	crow.ii.ansible.trigger_pulse(j)
+   	crow.ii.txo.tr_time( j, 5)
+   	crow.ii.txo.tr_pulse(j)
+   	crow.ii.txo.cv(j, 0)
+   	crow.ii.txo.cv_slew(j, 0)
   end
 
   -- extra clocks
@@ -376,9 +398,11 @@ function enc(n, delta)
 end
 
 function key(n,z)
+  if n==2 then
+    altOpt = z==1
+  end
   if n==1 then
     alt = z==1
-
   elseif mode == 1 then --step
     if n==2 and z==1 then
       if not alt==true then
@@ -500,7 +524,7 @@ function redraw()
     screen.level((track_no_edit==i and mode==3) and 10 or 2)
     screen.text("Trk"..i)
     screen.move(10+i*24,48)
-    screen.text("1/"..params:get("trk_"..i.."_step_div"))
+    screen.text(params:get("trk_"..i.."_steps").."/"..params:get("trk_"..i.."_step_div"))
     screen.move(10+i*24,56)
     screen.text("T:"..params:get("trk_"..i.."_transpose"))
     screen.move(10+i*24,64)
@@ -573,6 +597,8 @@ function a.delta(n, d)
 
   if alt then
       params:delta("trk_"..n.."_step_div", dlt)
+  elseif altOpt then
+        params:delta("trk_"..n.."_steps", dlt)
   else
     voiceClockDir[n]=voiceClockDir[n]+dlt
     if voiceClockDir[n]<-2 then voiceClockDir[n]=-2 end
@@ -583,13 +609,12 @@ end
 
 function arc_redraw()
   a:all(0)
-
-
-
   for i=1,4 do
     if alt then
         a:segment(i, 0,6/(16/params:get("trk_"..i.."_step_div")), 10)
-      else
+      elseif altOpt then
+         a:segment(i, 0,6/(16/params:get("trk_"..i.."_steps")), 10)
+        else
         a:segment(i, voiceClockDir[i],voiceClockDir[i]+1, 15)
     end
   end
