@@ -18,7 +18,7 @@ Also available are options to direct clock-signals, extra LFO's and random volta
 ### Requirements:
 - Crow
 
-Optional: *Ansible, Arc, Grid, MIDI*
+Optional: *Ansible, Arc, Grid, MIDI, TXo*
 
 ### Controls:
 - **Grids** controls pattern
